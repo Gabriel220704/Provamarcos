@@ -22,6 +22,8 @@ test('API valida tarefas, edita, conclui e persiste após reiniciar', async () =
   const edited=await request(`/api/tasks/${id}`,'PUT',{title:'Revisar',description:'Capítulo 2',priority:'Baixa'});
   assert.equal(edited.data.title,'Revisar'); assert.equal(edited.data.priority,'Baixa'); assert.equal(edited.data.status,'Pendente'); assert.ok(edited.data.updated_at);
   assert.equal((await request('/api/tasks/99999','PUT',{title:'Teste',priority:'Média'})).status,404);
+  assert.equal((await request('/api/tasks/999999999999999999999','PUT',{title:'Teste',priority:'Média'})).status,404);
+  assert.equal((await request('/api/tasks/0','PUT',{title:'Teste',priority:'Média'})).status,404);
   const completed=await request(`/api/tasks/${id}`,'PUT',{...edited.data,status:'Concluída'}); assert.equal(completed.data.status,'Concluída');
   for(const path of ['/','/app.js','/style.css']) assert.equal((await fetch(base+path)).status,200);
   assert.equal((await fetch(base+'/server.js')).status,404);
@@ -29,4 +31,21 @@ test('API valida tarefas, edita, conclui e persiste após reiniciar', async () =
   const persisted=(await request('/api/tasks','GET')).data; assert.equal(persisted.length,1); assert.equal(persisted[0].status,'Concluída');
   assert.equal((await request(`/api/tasks/${id}`,'PUT',{...persisted[0],status:'Pendente'})).data.status,'Pendente');
  } finally {if(server?.listening) await stop(); rmSync(folder,{recursive:true,force:true});}
+});
+
+test('preserva UTF-8 quando um caractere chega em partes diferentes', async () => {
+ const { request } = await import('node:http');
+ const server=createApp(':memory:');
+ server.listen(0,'127.0.0.1'); await once(server,'listening');
+ try {
+  const body=Buffer.from(JSON.stringify({title:'Revisão',priority:'Média'}));
+  const split=body.indexOf(Buffer.from('ã'))+1;
+  const result=await new Promise((resolve,reject)=>{
+   const req=request({hostname:'127.0.0.1',port:server.address().port,path:'/api/tasks',method:'POST',headers:{'Content-Type':'application/json'}},res=>{
+    let raw='';res.setEncoding('utf8');res.on('data',chunk=>raw+=chunk);res.on('end',()=>resolve({status:res.statusCode,data:JSON.parse(raw)}));
+   });
+   req.on('error',reject);req.write(body.subarray(0,split));setTimeout(()=>req.end(body.subarray(split)),20);
+  });
+  assert.equal(result.status,201);assert.equal(result.data.title,'Revisão');
+ } finally {const closed=once(server,'close');server.close();await closed;}
 });

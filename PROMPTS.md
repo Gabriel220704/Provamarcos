@@ -6,7 +6,7 @@
 
 ## Prompt 2
 
-[Adicionar aqui o segundo prompt]
+[Adicionar aqui o texto real do Prompt 2: revisão técnica, funcional e visual do Task Flow IA solicitada pelo autor.]
 
 ## Prompt 3
 

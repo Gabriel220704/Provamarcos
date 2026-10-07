@@ -39,6 +39,8 @@ npm test
 
 Os testes verificam a API HTTP, criação, edição, conclusão, validações, recursos estáticos e persistência após reabrir o banco.
 
+Na revisão, a interface também foi testada no Edge com as três prioridades, edição, conclusão, os três filtros, recarga e reinício do servidor. As larguras de 320, 375, 768 e 1280 pixels foram verificadas sem transbordamento horizontal. Essa verificação de navegador é independente de `npm test` e não adiciona dependências à aplicação.
+
 ## Limitações
 
 Projeto local para uso acadêmico, sem autenticação, integração com IA ou sincronização entre dispositivos. O nome Task Flow IA não implica uma funcionalidade de inteligência artificial. O servidor escuta apenas em `127.0.0.1`. Node.js pode exibir um aviso sobre o módulo SQLite experimental. Os dados não são enviados ao GitHub; copie a pasta `database/` com o servidor parado para fazer backup.

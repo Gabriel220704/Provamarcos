@@ -14,6 +14,7 @@ export function createApp(path) {
    const match = url.pathname.match(/^\/api\/tasks\/(\d+)$/);
    if (url.pathname === '/api/tasks' && req.method === 'GET') return json(res,200,db.prepare('SELECT * FROM tasks ORDER BY id DESC').all());
    if ((url.pathname === '/api/tasks' && req.method === 'POST') || (match && req.method === 'PUT')) {
+    req.setEncoding('utf8');
     let raw = ''; for await (const chunk of req) { raw += chunk; if (Buffer.byteLength(raw)>16384) return json(res,413,{error:'Dados muito grandes.'}); }
     let data; try { data=JSON.parse(raw); } catch { return json(res,400,{error:'JSON inválido.'}); }
     if (!data || typeof data.title !== 'string' || !data.title.trim() || data.title.trim().length>200) return json(res,400,{error:'Informe um título de até 200 caracteres.'});
@@ -22,7 +23,9 @@ export function createApp(path) {
     if (data.status !== undefined && !['Pendente','Concluída'].includes(data.status)) return json(res,400,{error:'Status inválido.'});
     const now=new Date().toISOString(); let id;
     if (match) {
-     id=Number(match[1]); const task=db.prepare('SELECT * FROM tasks WHERE id=?').get(id);
+     id=Number(match[1]);
+     if (!Number.isSafeInteger(id) || id < 1) return json(res,404,{error:'Tarefa não encontrada.'});
+     const task=db.prepare('SELECT * FROM tasks WHERE id=?').get(id);
      if (!task) return json(res,404,{error:'Tarefa não encontrada.'});
      db.prepare('UPDATE tasks SET title=?,description=?,priority=?,status=?,updated_at=? WHERE id=?').run(data.title.trim(),data.description??'',data.priority,data.status??task.status,now,id);
     } else id=Number(db.prepare('INSERT INTO tasks (title,description,priority,status,created_at) VALUES (?,?,?,?,?)').run(data.title.trim(),data.description??'',data.priority,'Pendente',now).lastInsertRowid);
