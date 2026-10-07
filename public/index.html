@@ -1,8 +1,4 @@
-<!doctype html>
-<html lang="pt-BR">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Task Flow IA</title>
-<h1>Task Flow IA</h1>
-<p>Organize suas tarefas em um só lugar.</p>
-</html>
+﻿<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Task Flow IA</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main><header><div><p class="eyebrow">SEU DIA, MAIS ORGANIZADO</p><h1>Task Flow IA<span>.</span></h1><p>Uma tarefa de cada vez. Um passo mais perto.</p></div><button id="new-task">+ Nova tarefa</button></header><p id="feedback" role="status" aria-live="polite"></p><section aria-label="Suas tarefas"><div class="list-heading"><h2>Minhas tarefas</h2><span id="count"></span></div><div id="filters" aria-label="Filtrar por status"></div><div id="tasks"></div></section></main>
+<dialog id="editor"><form id="task-form"><h2 id="form-heading">Nova tarefa</h2><label for="title">Título *</label><input id="title" name="title" required maxlength="200" placeholder="O que você precisa fazer?"><label for="description">Descrição</label><textarea id="description" name="description" maxlength="5000" rows="4"></textarea><label for="priority">Prioridade</label><select id="priority" name="priority"><option>Baixa</option><option selected>Média</option><option>Alta</option></select><p id="form-error" role="alert"></p><div class="form-actions"><button type="button" id="cancel" class="secondary">Cancelar</button><button id="save" type="submit">Salvar tarefa</button></div></form></dialog></body></html>
