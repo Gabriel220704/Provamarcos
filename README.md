@@ -78,3 +78,21 @@ Na revisão, a interface também foi testada no Edge com as três prioridades, e
 ## Limitações
 
 Projeto local para uso acadêmico, sem autenticação, integração com IA ou sincronização entre dispositivos. O nome Task Flow IA não implica uma funcionalidade de inteligência artificial. O servidor escuta apenas em `127.0.0.1`. Node.js pode exibir um aviso sobre o módulo SQLite experimental. Os dados não são enviados ao GitHub; copie a pasta `database/` com o servidor parado para fazer backup.
+
+## Resumo do desenvolvimento e controle da qualidade
+
+Durante a construção do **Task Flow IA**, implementei as funcionalidades pedidas: cadastro, edição, conclusão, reabertura, filtros por status e prioridades. Usei uma stack simples, com JavaScript, Node.js e SQLite, garantindo que as tarefas permanecessem salvas após atualizar a página ou reiniciar o servidor. Também organizei os arquivos, documentei a execução e preservei o projeto anterior ao criar um repositório próprio para o aplicativo.
+
+Na revisão do diff, corrigi pontos que os primeiros testes não cobriam:
+
+- IDs muito grandes podiam causar erro interno.
+- Caracteres acentuados podiam ser corrompidos quando a requisição chegava em partes.
+- Ações durante o salvamento podiam gerar operações concorrentes.
+- Faltavam mensagens mais claras para falhas de conexão e porta ocupada.
+- O formulário precisava de ajustes de acessibilidade e adaptação a telas pequenas.
+
+Quanto aos riscos do trabalho com agentes, **não foram usados agentes auxiliares**; trabalhei como um único agente. Os riscos observados foram incluir exclusões do projeto anterior nos commits, publicar no repositório errado e confiar apenas nos testes da API sem conferir a interface. Controlei esses riscos separando os repositórios, verificando o remoto e testando o aplicativo no navegador. Também mantive o `AGENTS.md` reservado ao autor e registrei apenas prompts realmente utilizados.
+
+Os testes e commits ajudaram no controle da qualidade. Os testes automatizados verificaram validações, edição, conclusão, persistência e preservação de acentos. No Edge, validei as três prioridades, os filtros, a recarga, o reinício e telas de 320 a 1280 pixels. Por fim, testei a inicialização em uma cópia limpa.
+
+O desenvolvimento ficou registrado em **seis commits com mudanças reais**: estrutura inicial, cadastro e edição, filtros e conclusão, correções da revisão, ajuste de inicialização e documentação final. Essa divisão facilitou conferir cada etapa e identificar onde as alterações foram feitas.
