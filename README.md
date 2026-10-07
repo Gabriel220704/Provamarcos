@@ -24,3 +24,21 @@ Abra http://localhost:3000. Para parar, pressione Ctrl+C.
 - `PROMPTS.md`: estrutura para registrar os três prompts reais.
 
 O projeto usa os módulos nativos do Node.js, incluindo `node:sqlite`.
+
+## Funcionalidades e uso
+
+Clique em **Nova tarefa**, preencha o título obrigatório, a descrição opcional e a prioridade (Baixa, Média ou Alta). A tarefa começa como Pendente. Use **Editar** para alterar seus dados, **Concluir** para finalizar e **Reabrir** para voltar a Pendente. Os filtros **Todas**, **Pendentes** e **Concluídas** atualizam a lista imediatamente.
+
+O servidor valida título, prioridade e status e retorna mensagens para dados inválidos ou tarefas inexistentes. O banco mantém as tarefas após recarregar a página ou reiniciar o servidor. IDs e datas de criação/atualização são gerados automaticamente. A interface se adapta a telas menores.
+
+## Testar
+
+```sh
+npm test
+```
+
+Os testes verificam a API HTTP, criação, edição, conclusão, validações, recursos estáticos e persistência após reabrir o banco.
+
+## Limitações
+
+Projeto local para uso acadêmico, sem autenticação, integração com IA ou sincronização entre dispositivos. O nome Task Flow IA não implica uma funcionalidade de inteligência artificial. O servidor escuta apenas em `127.0.0.1`. Node.js pode exibir um aviso sobre o módulo SQLite experimental. Os dados não são enviados ao GitHub; copie a pasta `database/` com o servidor parado para fazer backup.

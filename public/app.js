@@ -1,17 +1,38 @@
 ﻿const $ = selector => document.querySelector(selector);
 let tasks = [], editingId = null;
+let filter = 'Todas';
+for (const label of ['Todas', 'Pendentes', 'Concluídas']) {
+ const button = document.createElement('button');
+ button.textContent = label;
+ button.addEventListener('click', () => { filter = label; render(); });
+ $('#filters').append(button);
+}
 async function api(path, options) {
  const response = await fetch(path, options); const data = await response.json();
  if (!response.ok) throw new Error(data.error || 'Falha ao realizar operação.'); return data;
 }
 function render() {
  $('#tasks').replaceChildren(); $('#count').textContent = `${tasks.length} tarefa(s)`;
- if (!tasks.length) { const empty=document.createElement('p'); empty.className='empty'; empty.textContent='Tudo começa com um primeiro passo. Crie sua primeira tarefa.'; $('#tasks').append(empty); }
- for (const task of tasks) {
+ for (const button of $('#filters').children) { button.className=button.textContent===filter?'active':'secondary'; button.setAttribute('aria-pressed',String(button.textContent===filter)); }
+ const visible=tasks.filter(task=>filter==='Todas'||task.status===(filter==='Pendentes'?'Pendente':'Concluída'));
+ if (!visible.length) { const empty=document.createElement('p'); empty.className='empty'; empty.textContent=tasks.length?'Nenhuma tarefa neste filtro.':'Tudo começa com um primeiro passo. Crie sua primeira tarefa.'; $('#tasks').append(empty); }
+ for (const task of visible) {
   const card=document.createElement('article'), title=document.createElement('h3'), description=document.createElement('p'), metadata=document.createElement('small'), edit=document.createElement('button');
   title.textContent=task.title; description.textContent=task.description || 'Sem descrição'; metadata.textContent=`${task.priority} · ${task.status}`;
   edit.textContent='Editar'; edit.className='secondary'; edit.addEventListener('click',()=>openEditor(task));
-  card.append(title,description,metadata,edit); $('#tasks').append(card);
+  card.className=task.status==='Concluída'?'completed':'';
+  metadata.className=`badge priority-${['Baixa','Média','Alta'].indexOf(task.priority)}`;
+  const complete=document.createElement('button'); complete.className='secondary'; complete.textContent=task.status==='Concluída'?'Reabrir':'Concluir';
+  complete.setAttribute('aria-label',`${complete.textContent}: ${task.title}`);
+  complete.addEventListener('click',async()=>{
+   complete.disabled=true;
+   try {
+    const updated=await api(`/api/tasks/${task.id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...task,status:task.status==='Concluída'?'Pendente':'Concluída'})});
+    tasks=tasks.map(item=>item.id===updated.id?updated:item); render(); $('#feedback').textContent='Status atualizado.';
+   } catch(error) { $('#feedback').textContent=error.message; complete.disabled=false; }
+  });
+  const dates=document.createElement('p'); dates.className='dates'; dates.textContent=`Criada em ${new Date(task.created_at).toLocaleString('pt-BR')}${task.updated_at?` · Atualizada em ${new Date(task.updated_at).toLocaleString('pt-BR')}`:''}`;
+  card.append(title,description,metadata,edit,complete,dates); $('#tasks').append(card);
  }
 }
 function openEditor(task) {
