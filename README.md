@@ -14,6 +14,15 @@ npm start
 
 Abra http://localhost:3000. Para parar, pressione Ctrl+C.
 
+Se a porta 3000 estiver ocupada, escolha outra no PowerShell:
+
+```powershell
+$env:PORT = '3001'
+npm start
+```
+
+Nesse caso, abra http://localhost:3001.
+
 ## Tecnologias e estrutura
 
 - `server.js`: servidor HTTP em JavaScript.

@@ -39,6 +39,16 @@ export function createApp(path) {
  server.on('close',()=>db.close()); return server;
 }
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
+ const port=Number(process.env.PORT??3000);
+ if (!Number.isInteger(port) || port<1 || port>65535) {
+  console.error('PORT deve ser um número entre 1 e 65535.');
+  process.exit(1);
+ }
  mkdirSync(new URL('./database/',import.meta.url),{recursive:true});
- createApp(fileURLToPath(new URL('./database/taskflow.db',import.meta.url))).listen(3000,'127.0.0.1',()=>console.log('Task Flow IA: http://localhost:3000'));
+ const app=createApp(fileURLToPath(new URL('./database/taskflow.db',import.meta.url)));
+ app.on('error',error=>{
+  console.error(error.code==='EADDRINUSE'?`A porta ${port} está ocupada. Defina PORT para usar outra porta.`:error.message);
+  process.exit(1);
+ });
+ app.listen(port,'127.0.0.1',()=>console.log(`Task Flow IA: http://localhost:${port}`));
 }
